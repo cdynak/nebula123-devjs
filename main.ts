@@ -1,11 +1,6 @@
-import {
-  Application,
-  Router,
-  Context,
-} from "https://deno.land/x/oak@v10.6.0/mod.ts";
+import { Application } from "https://deno.land/x/oak/mod.ts";
 
 const app = new Application();
-const mainRouter = new Router();
 
 const getRandomFortune = async (): Promise<string> => {
   const response = await fetch("https://api.sen.cat/api/fortune");
@@ -13,17 +8,9 @@ const getRandomFortune = async (): Promise<string> => {
   return jsonBody.fortune;
 };
 
-mainRouter.get("/", async (ctx: Context) => {
+app.use(async (ctx) => {
   const fortune = await getRandomFortune();
-  ctx.response.headers.set("content-type", "text/html; charset=utf-8");
-  ctx.response.body = `<pre>Your fortune:\n${fortune}</pre>`;
-});
-
-app.use(mainRouter.routes());
-app.use(mainRouter.allowedMethods());
-
-app.addEventListener("listen", (e) => {
-  console.log(`App lunched @ ${e.port} 🚀`);
+  ctx.response.body = `Your fortune:\n${fortune}`;
 });
 
 await app.listen({ port: 8080 });
